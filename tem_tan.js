@@ -324,7 +324,7 @@ controller.hears('サイコロの旅', ['ambient'], function(bot, message) {
 	bot.reply(message,out_str);
 })
 controller.hears(['こんちは','こんにちは'],'direct_message,direct_mention,mention',function(bot, message) {
-	getSlackUser(message.user,function(UserProf){
+	getSlackUser(bot,message,function(UserProf){
 		console.log("AAA:"+UserProf.name);
 		var out_str = "こんにちは！";
 		if(UserProf.real_name != undefined){
@@ -339,7 +339,7 @@ controller.hears(['こんちは','こんにちは'],'direct_message,direct_menti
 });
 // fushianasan
 controller.hears(['fushianasan','fusianasan'], ['ambient'], function(bot, message) {
-	getSlackUser(message.user,function(UserProf){
+	getSlackUser(bot,message,function(UserProf){
 		var out_str = "お兄ちゃんの情報を開示するよ！\n";
 		out_str += ("ID:"+UserProf.id+"\n");
 		out_str += ("Name:"+UserProf.name+"\n");
@@ -355,6 +355,10 @@ controller.hears(['fushianasan','fusianasan'], ['ambient'], function(bot, messag
 // マインスイーパ
 controller.hears(['マインスイーパ','mine'], ['ambient'], function(bot, message) {
 	play_mine(controller,bot,message);
+})
+// 乗換検索
+controller.hears(['乗り換え','乗換'], ['ambient'], function(bot, message) {
+	
 })
 controller.hears(['じゃんけん','ジャンケン'], ['ambient'], function(bot, message) {
 		console.log("USER:"+message.user);
@@ -464,11 +468,13 @@ controller.hears(['help','ヘルプ','説明'], ['ambient'], function(bot, messa
 	bot.reply(message,out_str);
 })
 // 関数郡
+
 // 指定したIDのユーザ情報を取得できる。コールバック関数なので注意！
-// IDは message.user で指定可能
-function getSlackUser(user_id,callback){
-	// アクセストークン
-	var token = "xoxp-9482125713-9514436995-11410551730-4945094f1f";
+// 引数は(bot,message,callback)の形
+function getSlackUser(bot,message,callback){
+	// Botのアクセストークン取得
+	var token = bot.config.token;
+	var user_id = message.user;
 	// HTTPリクエスト
 	var request = require('request');
 	var in_url = "https://slack.com/api/users.list?token=" + token;
@@ -486,14 +492,6 @@ function getSlackUser(user_id,callback){
 					if(members[i].id == user_id){
 						callback(members[i]);
 					}
-					console.log("Name:"+members[i].name);
-					console.log("Color:"+members[i].color);
-					console.log("RealName:"+members[i].real_name);
-					console.log("Time Zone:"+members[i].tz);
-					console.log("FULL NAME:"+members[i].profile.first_name+" "+members[i].profile.last_name);
-					console.log("Skype:"+members[i].profile.skype);
-					console.log("Image:"+members[i].profile.image_original);
-					console.log("Email:"+members[i].profile.email+"\n");
 				}
 			}
 			else{
@@ -505,6 +503,7 @@ function getSlackUser(user_id,callback){
 		}
 	});
 }
+
 // Wikipediaランダム
 function get_wiki_rand(message){
 	var get_url = "https://ja.wikipedia.org/wiki/%E7%89%B9%E5%88%A5:%E3%81%8A%E3%81%BE%E3%81%8B%E3%81%9B%E8%A1%A8%E7%A4%BA"
