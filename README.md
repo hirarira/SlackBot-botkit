@@ -1,0 +1,2 @@
+# SlackTemtanBot
+Slackのテムたんbotを動かすゴミみたいなコード、botkit使用
