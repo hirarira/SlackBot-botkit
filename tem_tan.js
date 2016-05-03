@@ -446,6 +446,8 @@ controller.hears(['さよなら'],'direct_message,direct_mention,mention',functi
         ]);
     });
 });
+// help
+// helpに表示されない隠しコマンド(さよなら,fusianasan,@tem_tan こんにちは,サイコロの旅)
 controller.hears(['help','ヘルプ','説明'], ['ambient'], function(bot, message) {
 	var out_str = "わたしが反応する言葉を紹介するね！\n";
 	out_str += "・おはなし\n";
@@ -468,6 +470,11 @@ controller.hears(['help','ヘルプ','説明'], ['ambient'], function(bot, messa
 	out_str += "マインスイーパを遊ぶことができるよ！\n\"mine,X座標,Y座標\"でも開くことができるよ！\n\n";
 	out_str += "・じゃんけん\n";
 	out_str += "そのまんんまだけど、私とじゃんけんをして遊べるよ！\n\n";
+	out_str += "・乱数|rand";
+	out_str += "0からお兄ちゃんたちが入力した値までの間の値をランダムで出すよー！\n1以上の値を入力してね！";
+	out_str += "・乗換\n";
+	out_str += "(乗換 {出発駅} {到着駅} {出発日} {出発時刻})の形で乗換検索ができるよ！\n"
+	out_str += "出発日と出発時刻を省略すると、今の日時が入るよ！\n\n";
 	bot.reply(message,out_str);
 })
 // 関数郡
@@ -764,85 +771,77 @@ function get_tenki(message,pl_num){
 	})
 }
 function get_word(message,get_no){
-	var add_url = "";
+	// Inputテスト
+	var fs = require('fs');
+	var buf,read_str,temtan_word;
 	switch(get_no){
 		case 0:
-			add_url = 'http://localhost/ajax_test/get.php'
+			buf = fs.readFileSync("./var/rememberWord.txt");
+			read_str = buf.toString();
+			temtan_word = read_str.split("\n");
 		break;
-		case 1:
-			add_url = 'http://localhost/ajax_test/music_get.php'
+		default:
+			buf = fs.readFileSync("./var/movie.txt");
+			read_str = buf.toString();
+			temtan_word = analyze_csv(read_str);
 		break;
 	}
-	var request = require('request');
-	request(add_url, function (error, response, body) {
-	  if (!error && response.statusCode == 200) {
-		console.log('OK: '+ response.statusCode);
-		var temtan_word = createArray(body,0);
-		var out_str = '今私が覚えてるのは…\n';
-		for(var i = 0;i< temtan_word.length;i++){
-			if(get_no == 1 && temtan_word[i].substring(0,4)=="http"){
-				// スクレイピング
-				// http://qiita.com/ktty1220/items/64168e8d416d6d8ffb45 参照
-				// https://www.npmjs.com/package/cheerio-httpcli
-				console.log(temtan_word[i]);
-				console.log("test");
-				var client = require('cheerio-httpcli');
-				var movie_about = client.fetchSync(temtan_word[i]);
-				console.log(movie_about.$('title').text());
-				out_str += movie_about.$('title').text() + "\n";
-				out_str += temtan_word[i]+"\n\n";
+	var out_str = '今私が覚えてるのは…\n';
+	for(var i = 0;i< temtan_word.length;i++){
+		if(get_no == 1){
+			if(temtan_word[i][0] != undefined && temtan_word[i][1] != undefined){
+				out_str += temtan_word[i][1] + "\n" + temtan_word[i][0] + "\n\n";
 			}
-			else if(get_no == 0){
+		}
+		else if(get_no == 0){
+			if(temtan_word[i] != undefined){
 				out_str += temtan_word[i];
 				out_str += "\n";
 			}
 		}
-		out_str += "だよ！お兄ちゃん！";
-		bot.reply(message,out_str);
-	  } else {
-		console.log('error: '+ response.statusCode);
-	  }
-	})
+	}
+	out_str += "だよ！お兄ちゃん！";
+	bot.reply(message,out_str);
 }
 
 function remember_word(add_value,message,add_no){
 	var add_url = "";
 	switch(add_no){
 		case 0:
-			add_url = 'http://localhost/ajax_test/add.php'
+			add_url = './var/rememberWord.txt'
 		break;
 		case 1:
-			add_url = 'http://localhost/ajax_test/music_add.php'
+			add_url = './var/movie.txt'
 			if(add_value.substring(0,5)!="<http"){
 				bot.reply(message,'あれぇ〜？動画のURLじゃないみたいだよ〜？');
 				return;
 			}
 			else{
 				add_value = add_value.substring(1,add_value.length-1);
+				add_value += ",";
+				// スクレイピング
+				// http://qiita.com/ktty1220/items/64168e8d416d6d8ffb45 参照
+				// https://www.npmjs.com/package/cheerio-httpcli
+				var client = require('cheerio-httpcli');
+				var movie_about = client.fetchSync(add_value);
+				console.log(movie_about.$('title').text());
+				add_value += movie_about.$('title').text();
 			}
 		break;
 	}
-	console.log("add_value:"+add_value);
-	var add_str = "in_value=" + add_value;
-	var request = require('request');
-	var options = {
-	  uri: add_url,
-	  form: { in_value: add_value },
-	  json: true
-	};
-	console.log("add_str:"+add_str);
-	request.post(options, function(error, response, body){
-	  if (!error && response.statusCode == 200) {
-		console.log(body);
-		if(body == "OK"){
-			bot.reply(message,'「' +add_value + ' 」を覚えたよ！');
+	var fs = require('fs');
+	fs.appendFile(add_url,add_value+"\n",'utf8', function (err) {
+		console.log(err);
+		if(err == null){
+			switch(add_no){
+				case 0:
+					bot.reply(message,'「' +add_value + ' 」を覚えたよ！');
+				break;
+				case 1:
+					bot.reply(message,"次の動画を追加したよ!\n"+movie_about.$('title').text());
+				break;
+			}
 		}
-		else{
-			bot.reply(message,'「' +add_value + ' 」はもう覚えてるよ？');
-		}
-	  } else {
-		console.log('error: '+ response.statusCode);
-	  }
 	});
 }
 function createArray(csvData,num) {
