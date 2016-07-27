@@ -79,7 +79,7 @@ var bot = controller.spawn({
     token: process.env.token
 }).startRTM();
 
-controller.hears(['おはなし'],'ambient',function(bot, message) {
+controller.hears(['(^おはなし$)'],'ambient',function(bot, message) {
 	var rnd = Math.floor( Math.random() * 14 );
 	var SayString;
 	switch(rnd){
@@ -138,7 +138,7 @@ controller.hears(['おはなし'],'ambient',function(bot, message) {
         ]);
     });
 });
-controller.hears(['おぼえて','覚えて'],'direct_message,direct_mention,mention',function(bot, message) {
+controller.hears(['((おぼ|覚)えて)'],'direct_message,direct_mention,mention',function(bot, message) {
 	bot.startConversation(message,function(err, convo) {
         convo.ask("わかった！何を覚えればいいの？",[
             {
@@ -152,7 +152,7 @@ controller.hears(['おぼえて','覚えて'],'direct_message,direct_mention,men
     });
 });
 
-controller.hears(['話して','はなして'], ['ambient'], function(bot, message) {
+controller.hears(['(^話して$)','(^はなして$)'], ['ambient'], function(bot, message) {
     controller.storage.users.get(message.user,function(err, temtan_word) {
 		var temtan_word = new Array();
 		temtan_word = get_word(message,0);
@@ -171,24 +171,24 @@ controller.hears(['動画追加','動画ついか'],'direct_message,direct_menti
         ]);
     });
 });
-controller.hears(['動画表示'], ['ambient'], function(bot, message) {
+controller.hears(['(^動画表示$)'], ['ambient'], function(bot, message) {
     controller.storage.users.get(message.user,function(err, temtan_word) {
 		var temtan_word = new Array();
 		temtan_word = get_word(message,1);
     });
 })
-controller.hears('UNDO', ['ambient'], function(bot, message) {
+controller.hears('(^UNDO$)', ['ambient'], function(bot, message) {
 	bot.reply(message, 'キエリンキエリン～・・・えいっ！\n…ってあれ！効果がないよぉ…');
 })
-controller.hears('clear', ['ambient'], function(bot, message) {
+controller.hears('(^clear$)', ['ambient'], function(bot, message) {
 	bot.reply(message, '全部消えちゃえ～っ！キエキエキエリン！・・・えいっ！\n…ってあれ！効果がないよぉ…');
 })
 controller.hears('テムたん', ['ambient'], function(bot, message) {
 	bot.reply(message, 'なーに？わたしのこと呼んだー？');
 })
-controller.hears(['天気おしえて','天気教えて'], ['ambient'], function(bot, message) {
+controller.hears(['(^天気(教|おし)えて$)'], ['ambient'], function(bot, message) {
 	bot.startConversation(message,function(err, convo) {
-        convo.ask('「どこの天気が知りたいの？」',[
+        convo.ask('どこの天気が知りたいの？',[
 		{
         	pattern: "東京",
             callback: function(response, convo) {
@@ -248,10 +248,10 @@ controller.hears(['天気おしえて','天気教えて'], ['ambient'], function
 		]);
 	});
 })
-controller.hears(['ていちゃ','てい☆ちゃ'], ['ambient'], function(bot, message) {
+controller.hears(['ていちゃ'], ['ambient'], function(bot, message) {
 	get_teicha(message);
 })
-controller.hears(['おしえて','教えて'], ['ambient'], function(bot, message) {
+controller.hears(['(^(おし|教)えて$)'], ['ambient'], function(bot, message) {
 	var out_str = get_wiki_rand(message);
 	bot.startConversation(message,function(err, convo) {
         convo.ask(out_str,[
@@ -289,7 +289,10 @@ controller.hears(['おしえて','教えて'], ['ambient'], function(bot, messag
         ]);
     });
 })
-controller.hears(['乱数','rand'], ['ambient'], function(bot, message) {
+controller.hears(['echo'], ['ambient'], function(bot, message) {
+  bot.reply(message,message.text);
+})
+controller.hears(['(^乱数$)','(^rand$)'], ['ambient'], function(bot, message) {
 	bot.startConversation(message,function(err, convo) {
         convo.ask("わかった！最大数はいくつにする？",[
             {
@@ -319,7 +322,7 @@ controller.hears(['乱数','rand'], ['ambient'], function(bot, message) {
         ]);
     });
 })
-controller.hears('サイコロの旅', ['ambient'], function(bot, message) {
+controller.hears('(^サイコロの旅$)', ['ambient'], function(bot, message) {
 	var latitude = (Math.random() * 180 ) - 90;
 	var longitude = (Math.random() * 360 )- 180;
 	var out_str = 'ころころころ〜！次の目的地はここだよ！頑張ってね！\n';
@@ -341,7 +344,7 @@ controller.hears(['こんちは','こんにちは'],'direct_message,direct_menti
 	});
 });
 // fushianasan
-controller.hears(['fushianasan','fusianasan'], ['ambient'], function(bot, message) {
+controller.hears(['(^fus(h?)ianasan$)'], ['ambient'], function(bot, message) {
 	getSlackUser(bot,message,function(UserProf){
 		var out_str = "お兄ちゃんの情報を開示するよ！\n";
 		out_str += ("ID:"+UserProf.id+"\n");
@@ -356,11 +359,11 @@ controller.hears(['fushianasan','fusianasan'], ['ambient'], function(bot, messag
 	});
 })
 // マインスイーパ
-controller.hears(['マインスイーパ','mine'], ['ambient'], function(bot, message) {
+controller.hears(['(^マインスイーパ$)','(^mine$)'], ['ambient'], function(bot, message) {
 	play_mine(controller,bot,message);
 })
 // 乗換検索
-controller.hears(['乗り換え','乗換'], ['ambient'], function(bot, message) {
+controller.hears(['(^乗(り?)換)'], ['ambient'], function(bot, message) {
 	Norikae(bot,message);
 })
 controller.hears(['じゃんけん','ジャンケン'], ['ambient'], function(bot, message) {
@@ -448,7 +451,7 @@ controller.hears(['さよなら'],'direct_message,direct_mention,mention',functi
 });
 // help
 // helpに表示されない隠しコマンド(さよなら,fusianasan,@tem_tan こんにちは,サイコロの旅)
-controller.hears(['help','ヘルプ','説明'], ['ambient'], function(bot, message) {
+controller.hears(['(^help$)','^ヘルプ$','^説明$'], ['ambient'], function(bot, message) {
 	var out_str = "わたしが反応する言葉を紹介するね！\n";
 	out_str += "・おはなし\n";
 	out_str += "お兄ちゃんたちにわたしが色々質問するよ！\n\n";
@@ -567,10 +570,10 @@ function Norikae(bot,message){
 			var NowDate = new Date();
 			// N分前にマッチ
 			if(in_str.match(/前|(B|b)efore/)){
-				
+
 			}
 			else if(in_str.match(/後|(A|a)fter/)){
-				
+
 			}
 			else{
 				var settimeOK = true;
@@ -692,7 +695,7 @@ function get_teicha(message){
 }
 //	天気情報取得
 function get_tenki(message,pl_num){
-	var add_pl_num = "130010";	
+	var add_pl_num = "130010";
 	var add_word = "";
 	// 天気の場所
 	// http://weather.livedoor.com/weather_hacks/rss_feed_list
@@ -932,7 +935,7 @@ function play_mine(controller,bot,message){
 				]);
 			});
 		}
-	
+
 	}
 }
 function play_mine_2(input_x,input_y){
