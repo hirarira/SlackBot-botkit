@@ -110,63 +110,33 @@ let bot = controller.spawn({
 // botkitデフォルトコードここまで
 // 以下、各種発言に反応
 controller.hears(['(^おはなし$)'],'ambient',function(bot, message) {
+	let WordList = [
+		'ねえねえ、好きな食べ物って何？',
+		'どこか外国行ったことある？',
+		'尊敬する人って・・・誰かな～？',
+		'どんなことが趣味なのかなあ？',
+		'どんなことが好きなの？',
+		'す、好きな人って誰かな///',
+		'いつもどれくらい寝てる？',
+		'いちばん大切にしてるものってな～に？',
+		'犬派かな？猫派かな？',
+		'好きなゲームってな～に？',
+		'夢ってなにかな～？',
+		'1番ほしいものってな～に？',
+		'お前も消してやろうか？',
+		'まだ起きてて大丈夫なの？'
+	];
 	let rnd = Math.floor( Math.random() * 14 );
-	let SayString;
-	switch(rnd){
-		case 0:
-			SayString = 'ねえねえ、好きな食べ物って何？';
-		break;
-		case 1:
-			SayString = 'どこか外国行ったことある？';
-		break;
-		case 2:
-			SayString = '尊敬する人って・・・誰かな～？';
-		break;
-		case 3:
-			SayString = 'どんなことが趣味なのかなあ？';
-		break;
-		case 4:
-			SayString = 'どんなことが好きなの？';
-		break;
-		case 5:
-			SayString = 'す、好きな人って誰かな///';
-		break;
-		case 6:
-			SayString = 'いつもどれくらい寝てる？';
-		break;
-		case 7:
-			SayString = 'いちばん大切にしてるものってな～に？';
-		break;
-		case 8:
-			SayString = '犬派かな？猫派かな？';
-		break;
-		case 9:
-			SayString = '好きなゲームってな～に？';
-		break;
-		case 10:
-			SayString = '夢ってなにかな～？';
-		break;
-		case 11:
-			SayString = '1番ほしいものってな～に？';
-		break;
-		case 12:
-			SayString = 'お前も消してやろうか？';
-		break;
-		case 13:
-			SayString = 'まだ起きてて大丈夫なの？';
-		break;
-	}
-    bot.startConversation(message,function(err, convo) {
-        convo.ask(SayString,[
-            {
-                default: true,
-                callback: function(response, convo) {
-                    convo.say('へぇ〜そうなんだ！');
-                    convo.next();
-                }
-            }
-        ]);
-    });
+	let SayString = WordList[rnd];
+  bot.startConversation(message,function(err, convo) {
+  	convo.ask(SayString,[{
+			default: true,
+      callback: function(response, convo) {
+    		convo.say('へぇ〜そうなんだ！');
+        convo.next();
+      }
+    }]);
+  });
 });
 controller.hears(['((おぼ|覚)えて)'],'direct_message,direct_mention,mention',function(bot, message) {
 	bot.startConversation(message,function(err, convo) {
@@ -216,64 +186,62 @@ controller.hears('テムたん', ['ambient'], function(bot, message) {
 });
 controller.hears(['(^天気(教|おし)えて$)'], ['ambient'], function(bot, message) {
 	bot.startConversation(message,function(err, convo) {
-        convo.ask('どこの天気が知りたいの？',[
+  	convo.ask('どこの天気が知りたいの？',[
 		{
-        	pattern: "東京",
-            callback: function(response, convo) {
-            	get_tenki(message,0);
-            	convo.next();
-            }
-        },{
-            pattern: "大阪",
-            callback: function(response, convo) {
-                get_tenki(message,1);
-                convo.next();
+    	pattern: "東京",
+      callback: function(response, convo) {
+      	get_tenki(message,0);
+        convo.next();
+      }
+    },{
+      pattern: "大阪",
+      callback: function(response, convo) {
+        get_tenki(message,1);
+        convo.next();
 			}
-        },{
-            pattern: "札幌",
-            callback: function(response, convo) {
-                get_tenki(message,2);
-                convo.next();
+    },{
+      pattern: "札幌",
+      callback: function(response, convo) {
+        get_tenki(message,2);
+        convo.next();
 			}
-        },{
-            pattern: "網走",
-            callback: function(response, convo) {
-                get_tenki(message,3);
-                convo.next();
+    },{
+      pattern: "網走",
+      callback: function(response, convo) {
+        get_tenki(message,3);
+        convo.next();
 			}
-        },{
-            pattern: "仙台",
-            callback: function(response, convo) {
-                get_tenki(message,4);
-                convo.next();
+    },{
+      pattern: "仙台",
+      callback: function(response, convo) {
+        get_tenki(message,4);
+        convo.next();
 			}
-        },
-		{
-            pattern: "名古屋",
-            callback: function(response, convo) {
-                get_tenki(message,5);
-                convo.next();
+    },{
+      pattern: "名古屋",
+      callback: function(response, convo) {
+        get_tenki(message,5);
+        convo.next();
 			}
-        },{
-            pattern: "岡山",
-            callback: function(response, convo) {
-                get_tenki(message,6);
-                convo.next();
+    },{
+      pattern: "岡山",
+      callback: function(response, convo) {
+        get_tenki(message,6);
+        convo.next();
 			}
-        },{
-            pattern: "那覇",
-            callback: function(response, convo) {
-                get_tenki(message,7);
-                convo.next();
+    },{
+      pattern: "那覇",
+      callback: function(response, convo) {
+        get_tenki(message,7);
+        convo.next();
 			}
-        },{
-            default: true,
-            callback: function(response, convo) {
-                convo.say('うーん…どこだかわからないよぉ…');
-                convo.next();
+    },{
+      default: true,
+      callback: function(response, convo) {
+        convo.say('うーん…どこだかわからないよぉ…');
+        convo.next();
 			}
-        }
-		]);
+    }]);
 	});
 });
 controller.hears(['ていちゃ'], ['ambient'], function(bot, message) {
@@ -481,32 +449,38 @@ controller.hears(['さよなら'],'direct_message,direct_mention,mention',functi
 // helpに表示されない隠しコマンド
 // (さよなら,fusianasan,@tem_tan こんにちは,サイコロの旅,echo)
 controller.hears(['(^help$)','^ヘルプ$','^説明$'], ['ambient'], function(bot, message) {
-	let out_str = "わたしが反応する言葉を紹介するね！\n";
-	out_str += "・おはなし\n";
-	out_str += "お兄ちゃんたちにわたしが色々質問するよ！\n\n";
-	out_str += "・@tem_tan おぼえて\n";
-	out_str += "お兄ちゃんたちの教えてくれた単語を覚えるよ！\nあまり変なことは覚えさせないでね…^^;\n\n";
-	out_str += "・はなして\n";
-	out_str += "お兄ちゃんたちが教えてくれた言葉を話すよ\nちょっと恥ずかしいけどね…	///\n\n";
-	out_str += "・@tem_tan 動画追加\n";
-	out_str += "Youtubeやニコニコとかの動画を覚えるよ！\n覚えたい動画のアドレスを教えてね！\n\n";
-	out_str += "・動画表示\n";
-	out_str += "わたしが覚えてる動画を表示するよ！\n\n";
-	out_str += "・天気教えて\n";
-	out_str += "明日と明後日の天気と気温を教えるよ！\n今答えられる所は「東京,大阪,仙台,札幌,網走,名古屋,那覇」だけだから気をつけてね！\n追加したい場所があったらパパに言ってね！\n\n";
-	out_str += "・ていちゃ\n";
-	out_str += "今のていちゃにいる人たちの数と、どんな人がいるのかを教えるよ！\n\n";
-	out_str += "・おしえて\n";
-	out_str += "わたしが魔法で持ってきたランダムな単語をお兄ちゃんに教えてあげるよ!\nどんな言葉が飛び出すかは使ってみてのお楽しみだよー！\n";
-	out_str += "・mine\n";
-	out_str += "マインスイーパを遊ぶことができるよ！\n\"mine,X座標,Y座標\"でも開くことができるよ！\n\n";
-	out_str += "・じゃんけん\n";
-	out_str += "そのまんんまだけど、私とじゃんけんをして遊べるよ！\n\n";
-	out_str += "・乱数|rand";
-	out_str += "0からお兄ちゃんたちが入力した値までの間の値をランダムで出すよー！\n1以上の値を入力してね！";
-	out_str += "・乗換\n";
-	out_str += "(乗換 {出発駅} {到着駅} {出発日} {出発時刻})の形で乗換検索ができるよ！\n"
-	out_str += "出発日と出発時刻を省略すると、今の日時が入るよ！\n\n";
+	let out_str = "わたしが反応する言葉を紹介するね！\n"
+	+"・おはなし\n"
+	+"お兄ちゃんたちにわたしが色々質問するよ！\n\n"
+	+"・@temtan おぼえて\n"
+	+"お兄ちゃんたちの教えてくれた単語を覚えるよ！\nあまり変なことは覚えさせないでね…^^;\n\n"
+	+"・はなして\n"
+	+"お兄ちゃんたちが教えてくれた言葉を話すよ\nちょっと恥ずかしいけどね…	///\n\n"
+	+"・@temtan 動画追加\n"
+	+"Youtubeやニコニコとかの動画を覚えるよ！\n覚えたい動画のアドレスを教えてね！\n\n"
+	+"・動画表示\n"
+	+"わたしが覚えてる動画を表示するよ！\n\n"
+	+"・天気教えて\n"
+	+"明日と明後日の天気と気温を教えるよ！\n"
+	+"今答えられる所は「東京,大阪,仙台,札幌,網走,名古屋,那覇」だけだから気をつけてね！\n"
+	+"追加したい場所があったらパパに言ってね！\n\n"
+	+"・ていちゃ\n"
+	+"今のていちゃにいる人たちの数と、どんな人がいるのかを教えるよ！\n\n"
+	+"・おしえて\n"
+	+"わたしが魔法で持ってきたランダムな単語をお兄ちゃんに教えてあげるよ!\n"
+	+"どんな言葉が飛び出すかは使ってみてのお楽しみだよー！\n"
+	+"・mine\n"
+	+"マインスイーパを遊ぶことができるよ！\n\"mine,X座標,Y座標\"でも開くことができるよ！\n\n"
+	+"・じゃんけん\n"
+	+"そのまんんまだけど、私とじゃんけんをして遊べるよ！\n\n"
+	+"・乱数|rand"
+	+"0からお兄ちゃんたちが入力した値までの間の値をランダムで出すよー！\n"
+	+"1以上の値を入力してね！"
+	+"・乗換\n"
+	+"(乗換 {出発駅} {到着駅} {出発日} {出発時刻})の形で乗換検索ができるよ！\n"
+	+"出発日と出発時刻を省略すると、今の日時が入るよ！\n\n"
+	+"・@temtan 今日のアニメは？\n"
+	+"今日お兄ちゃんが見るアニメを教えるよ！\n";
 	bot.reply(message,out_str);
 });
 // 今日のアニメを教えてくれる
@@ -754,44 +728,13 @@ function get_teicha(message){
 }
 //	天気情報取得
 function get_tenki(message,pl_num){
-	let add_pl_num = "130010";
-	let add_word = "";
 	// 天気の場所
 	// http://weather.livedoor.com/weather_hacks/rss_feed_list
-	switch(pl_num){
-		case 0:
-			add_pl_num = "130010";
-			add_word = "東京"
-		break;
-		case 1:
-			add_pl_num = "270000";
-			add_word = "大阪";
-		break;
-		case 2:
-			add_pl_num = "016010";
-			add_word = "札幌";
-		break;
-		case 3:
-			add_pl_num = "013010";
-			add_word = "網走";
-		break;
-		case 4:
-			add_pl_num = "040010";
-			add_word = "仙台";
-		break;
-		case 5:
-			add_pl_num = "230010";
-			add_word = "名古屋";
-		break;
-		case 6:
-			add_pl_num = "330010";
-			add_word = "岡山";
-		break;
-		case 7:
-			add_pl_num = "471010";
-			add_word = "那覇";
-		break;
-	}
+	let PlaceNumberList = ["130010","270000","016010","013010","040010",
+		"230010","330010","471010"];
+	let PlaceNameList = ["東京","大阪","札幌","網走","仙台","名古屋","岡山","那覇"];
+	let add_pl_num = PlaceNumberList[pl_num];
+	let add_word = PlaceNameList[pl_num];
 	let request = require('request');
 	url = 'http://weather.livedoor.com/forecast/webservice/json/v1?city=';
 	url += add_pl_num;
