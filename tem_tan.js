@@ -16,52 +16,13 @@ This bot demonstrates many of the core features of Botkit:
 * Use the conversation system to ask questions
 * Use the built in storage system to store and retrieve information
   for a user.
-
-# RUN THE BOT:
-
-  Get a Bot token from Slack:
-
-    -> http://my.slack.com/services/new/bot
-
-  Run your bot from the command line:
-
-    token=<MY TOKEN> node bot.js
-
-# USE THE BOT:
-
-  Find your bot inside Slack to send it a direct message.
-
-  Say: "Hello"
-
-  The bot will reply "Hello!"
-
-  Say: "who are you?"
-
-  The bot will tell you its name, where it running, and for how long.
-
-  Say: "Call me <nickname>"
-
-  Tell the bot your nickname. Now you are friends.
-
-  Say: "who am I?"
-
-  The bot will tell you your nickname, if it knows one for you.
-
-  Say: "shutdown"
-
-  The bot will ask if you are sure, and then shut itself down.
-
-  Make sure to invite your bot into other channels using /invite @<my bot>!
-
-# EXTEND THE BOT:
-
-  Botkit is has many features for building cool and useful bots!
-
-  Read all about it here:
-
-    -> http://howdy.ai/botkit
-
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+/*
+ * テムたんbot  v1.1.2.1
+ * 更新履歴は以下URLを参照のこと
+ * https://github.com/hirarira/SlackTemtanBot/commits/
+ */
 "use strict";
 // アニメデータを蓄積するためのclass
 class AnimeData{
@@ -250,39 +211,20 @@ controller.hears(['ていちゃ'], ['ambient'], function(bot, message) {
 controller.hears(['(^(おし|教)えて$)'], ['ambient'], function(bot, message) {
 	let out_str = get_wiki_rand(message);
 	bot.startConversation(message,function(err, convo) {
-        convo.ask(out_str,[
-            {
-                default: true,
-                callback: function(response, convo) {
-					let res = response.text;
-					if(res.match(/[知し]って(る|いる)|把握|存知|存じて|はい/)){
-						convo.say("へぇ〜お兄ちゃんは博識だねー！");
-		                convo.next();
-					}
-					else{
-						let request = require('request');
-						let url = "http://localhost/ajax_test/get_wiki.php";
-						request.post(url, function(error, response, body){
-							if (!error && response.statusCode == 200) {
-								console.log(body);
-								let out_str = "もー仕方ないなーお兄ちゃんは…これのことだよ！\n";
-								let in_url = "https://ja.wikipedia.org/wiki/" + body;
-								ShortURL(in_url,function(body){
-									console.log("ShortURL:"+body.id);
-									out_str += body.id;
-									convo.say(out_str);
-									convo.next();
-								});
-							} else {
-								console.log('error: '+ response.statusCode);
-								convo.say('error: '+ response.statusCode);
+        convo.ask(out_str,[{
+            default: true,
+            callback: function(response, convo) {
+							let res = response.text;
+							if(res.match(/[知し]って(る|いる)|把握|存知|存じて|はい/)){
+								convo.say("へぇ〜お兄ちゃんは博識だねー！");
 								convo.next();
 							}
-						});
-					}
-                }
+							else{
+								convo.say("えーお兄ちゃん知らないんだー…");
+								convo.next();
+							}
             }
-        ]);
+        }]);
     });
 });
 controller.hears(['echo'], ['ambient'], function(bot, message) {
@@ -355,7 +297,7 @@ controller.hears(['(^fus(h?)ianasan$)'], ['ambient'], function(bot, message) {
 	});
 });
 // マインスイーパ
-controller.hears(['(^マインスイーパ$)','(^mine$)'], ['ambient'], function(bot, message) {
+controller.hears(['(^マインスイーパ)','(^mine)'], ['ambient'], function(bot, message) {
 	play_mine(controller,bot,message);
 });
 // 乗換検索
@@ -685,28 +627,12 @@ function get_wiki_rand(message){
 	get_title = get_title.substr(0,get_title.length - 12);
 	out_str += get_title;
 	out_str += "」って知ってる？";
-	// DBに登録
-	let request = require('request');
-	let options = {
-		uri: "http://localhost/ajax_test/wiki_add.php",
-		form: { in_value: get_title },
-		json: true
-	};
-	request.post(options, function(error, response, body){
-		if (!error && response.statusCode == 200) {
-			console.log(body);
-		}
-		else{
-			console.log('error: '+ response.statusCode);
-		}
-	});
-	// DB登録ここまで
 	return out_str;
 }
 // ていちゃ情報取得
 function get_teicha(message){
 	let request = require('request');
-	url = 'http://localhost/teicha/get_teicha.php';
+	let url = 'http://localhost/hirarira/teacha/get_teicha.php';
 	request(url, function (error, response, body) {
 		if (!error && response.statusCode == 200) {
 			console.log('OK: '+ response.statusCode);
@@ -736,7 +662,7 @@ function get_tenki(message,pl_num){
 	let add_pl_num = PlaceNumberList[pl_num];
 	let add_word = PlaceNameList[pl_num];
 	let request = require('request');
-	url = 'http://weather.livedoor.com/forecast/webservice/json/v1?city=';
+	let url = 'http://weather.livedoor.com/forecast/webservice/json/v1?city=';
 	url += add_pl_num;
 	request(url, function (error, response, body) {
 		if (!error && response.statusCode == 200) {
@@ -1023,7 +949,7 @@ function play_mine_2(input_x,input_y){
 		Tansa[input_y][input_x] = 1;
 		Tansa = rensa_search(Tansa,Round,input_x,input_y);
 		// 現在盤面表示
-		let out_str = "0";
+		out_str = "0";
 		for(let i = 0;i < BanSize;i++){
 			out_str += "|" + i;
 		}
