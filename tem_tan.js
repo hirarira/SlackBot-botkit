@@ -1,9 +1,9 @@
 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-           ______     ______     ______   __  __     __     ______
-          /\  == \   /\  __ \   /\__  _\ /\ \/ /    /\ \   /\__  _\
-          \ \  __<   \ \ \/\ \  \/_/\ \/ \ \  _"-.  \ \ \  \/_/\ \/
-           \ \_____\  \ \_____\    \ \_\  \ \_\ \_\  \ \_\    \ \_\
-            \/_____/   \/_____/     \/_/   \/_/\/_/   \/_/     \/_/
+		   ______	 ______	 ______   __  __	 __	 ______
+		  /\  == \   /\  __ \   /\__  _\ /\ \/ /	/\ \   /\__  _\
+		  \ \  __<   \ \ \/\ \  \/_/\ \/ \ \  _"-.  \ \ \  \/_/\ \/
+		   \ \_____\  \ \_____\	\ \_\  \ \_\ \_\  \ \_\	\ \_\
+			\/_____/   \/_____/	 \/_/   \/_/\/_/   \/_/	 \/_/
 
 
 This is a sample Slack bot built with Botkit.
@@ -19,7 +19,7 @@ This bot demonstrates many of the core features of Botkit:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 /*
- * テムたんbot  v1.1.2.1
+ * テムたんbot  v1.1.3
  * 更新履歴は以下URLを参照のこと
  * https://github.com/hirarira/SlackTemtanBot/commits/
  */
@@ -37,39 +37,42 @@ class AnimeData{
 	}
 	showInfo(){
 		let outstr = "タイトル："+this.title+"\n";
-    if(this.count!=null){
+	if(this.count!=null){
 		  outstr += "#"+this.count+"：";
-    }
-    if(this.subTitle!=null){
-      outstr += this.subTitle+"\n";
-    }
+	}
+	if(this.subTitle!=null){
+	  outstr += this.subTitle+"\n";
+	}
 		outstr += "開始時刻："+this.startTime.getHours()+":"+this.startTime.getMinutes()+"\n";
-    if(this.channel!=null){
+	if(this.channel!=null){
 		  outstr += "放送局:"+this.channel+"\n";
-    }
+	}
 		outstr += "公式サイト："+this.url+"\n";
-    console.log(outstr);
+	console.log(outstr);
 		return outstr;
 	}
 }
 // ここからbotkitデフォルトコード
 if (!process.env.token) {
-    console.log('Error: Specify token in environment');
-    process.exit(1);
+	console.log('Error: Specify token in environment');
+	process.exit(1);
 }
 
 let Botkit = require('./lib/Botkit.js');
 let os = require('os');
 
 let controller = Botkit.slackbot({
-    debug: true,
+	debug: true,
 });
 
 let bot = controller.spawn({
-    token: process.env.token
+	token: process.env.token
 }).startRTM();
 // botkitデフォルトコードここまで
 // 以下、各種発言に反応
+
+// おはなし
+// ランダムでおはなしをする。
 controller.hears(['(^おはなし$)'],'ambient',function(bot, message) {
 	let WordList = [
 		'ねえねえ、好きな食べ物って何？',
@@ -92,117 +95,132 @@ controller.hears(['(^おはなし$)'],'ambient',function(bot, message) {
   bot.startConversation(message,function(err, convo) {
   	convo.ask(SayString,[{
 			default: true,
-      callback: function(response, convo) {
-    		convo.say('へぇ〜そうなんだ！');
-        convo.next();
-      }
-    }]);
+	  callback: function(response, convo) {
+			convo.say('へぇ〜そうなんだ！');
+		convo.next();
+	  }
+	}]);
   });
 });
+
+// おぼえて
+// テムたんに発言を覚えさせる
 controller.hears(['((おぼ|覚)えて)'],'direct_message,direct_mention,mention',function(bot, message) {
 	bot.startConversation(message,function(err, convo) {
-        convo.ask("わかった！何を覚えればいいの？",[
-            {
-                default: true,
-                callback: function(response, convo) {
+		convo.ask("わかった！何を覚えればいいの？",[
+			{
+				default: true,
+				callback: function(response, convo) {
 					remember_word(response.text,message,0);
-                    convo.next();
-                }
-            }
-        ]);
-    });
+					convo.next();
+				}
+			}
+		]);
+	});
 });
 
+
+// はなして
+// テムたんに覚えさせた発言を話す
 controller.hears(['(^話して$)','(^はなして$)'], ['ambient'], function(bot, message) {
-    controller.storage.users.get(message.user,function(err, temtan_word) {
-		    get_word(message,0);
-    });
+	controller.storage.users.get(message.user,function(err, temtan_word) {
+			get_word(message,0);
+	});
 });
+
+// 動画追加
 controller.hears(['動画追加','動画ついか'],'direct_message,direct_mention,mention',function(bot, message) {
 	bot.startConversation(message,function(err, convo) {
-        convo.ask("わかった！何を覚えればいいの？",[
-            {
-                default: true,
-                callback: function(response, convo) {
-					remember_word(response.text,message,1);
-                    convo.next();
-                }
-            }
-        ]);
-    });
+		convo.ask("わかった！何を覚えればいいの？",[{
+			default: true,
+			callback: function(response, convo) {
+				remember_word(response.text,message,1);
+				convo.next();
+			}
+		}]);
+	});
 });
+
+// 動画表示
 controller.hears(['(^動画表示$)'], ['ambient'], function(bot, message) {
-    controller.storage.users.get(message.user,function(err, temtan_word) {
-		    get_word(message,1);
-    });
+	controller.storage.users.get(message.user,function(err, temtan_word) {
+			get_word(message,1);
+	});
 });
+
+// UNDO
 controller.hears('(^UNDO$)', ['ambient'], function(bot, message) {
 	bot.reply(message, 'キエリンキエリン～・・・えいっ！\n…ってあれ！効果がないよぉ…');
 });
+
+// clear
 controller.hears('(^clear$)', ['ambient'], function(bot, message) {
 	bot.reply(message, '全部消えちゃえ～っ！キエキエキエリン！・・・えいっ！\n…ってあれ！効果がないよぉ…');
 });
+
+// 呼びかけ
 controller.hears('テムたん', ['ambient'], function(bot, message) {
 	bot.reply(message, 'なーに？わたしのこと呼んだー？');
 });
+
+// 天気
 controller.hears(['(^天気(教|おし)えて$)'], ['ambient'], function(bot, message) {
 	bot.startConversation(message,function(err, convo) {
-  	convo.ask('どこの天気が知りたいの？',[
-		{
-    	pattern: "東京",
-      callback: function(response, convo) {
-      	get_tenki(message,0);
-        convo.next();
-      }
-    },{
-      pattern: "大阪",
-      callback: function(response, convo) {
-        get_tenki(message,1);
-        convo.next();
+		convo.ask('どこの天気が知りたいの？',[{
+			pattern: "東京",
+			callback: function(response, convo) {
+				get_tenki(message,0);
+				convo.next();
 			}
-    },{
-      pattern: "札幌",
-      callback: function(response, convo) {
-        get_tenki(message,2);
-        convo.next();
+		},{
+			pattern: "大阪",
+			callback: function(response, convo) {
+			get_tenki(message,1);
+			convo.next();
 			}
-    },{
-      pattern: "網走",
-      callback: function(response, convo) {
-        get_tenki(message,3);
-        convo.next();
+		},{
+			pattern: "札幌",
+			callback: function(response, convo) {
+				get_tenki(message,2);
+				convo.next();
 			}
-    },{
-      pattern: "仙台",
-      callback: function(response, convo) {
-        get_tenki(message,4);
-        convo.next();
+		},{
+			pattern: "網走",
+			callback: function(response, convo) {
+				get_tenki(message,3);
+				convo.next();
 			}
-    },{
-      pattern: "名古屋",
-      callback: function(response, convo) {
-        get_tenki(message,5);
-        convo.next();
+		},{
+			pattern: "仙台",
+			callback: function(response, convo) {
+				get_tenki(message,4);
+				convo.next();
 			}
-    },{
-      pattern: "岡山",
-      callback: function(response, convo) {
-        get_tenki(message,6);
-        convo.next();
+		},{
+			pattern: "名古屋",
+			callback: function(response, convo) {
+				get_tenki(message,5);
+				convo.next();
 			}
-    },{
-      pattern: "那覇",
-      callback: function(response, convo) {
-        get_tenki(message,7);
-        convo.next();
+		},{
+			pattern: "岡山",
+			callback: function(response, convo) {
+				get_tenki(message,6);
+				convo.next();
 			}
-    },{
-      default: true,
-      callback: function(response, convo) {
-        convo.say('うーん…どこだかわからないよぉ…');
-        convo.next();
+		},{
+			pattern: "那覇",
+			callback: function(response, convo) {
+				get_tenki(message,7);
+				convo.next();
 			}
-    }]);
+		},{
+			default: true,
+			callback: function(response, convo) {
+				convo.say('うーん…どこだかわからないよぉ…');
+				convo.next();
+			}
+		}]);
 	});
 });
 controller.hears(['ていちゃ'], ['ambient'], function(bot, message) {
@@ -211,54 +229,52 @@ controller.hears(['ていちゃ'], ['ambient'], function(bot, message) {
 controller.hears(['(^(おし|教)えて$)'], ['ambient'], function(bot, message) {
 	let out_str = get_wiki_rand(message);
 	bot.startConversation(message,function(err, convo) {
-        convo.ask(out_str,[{
-            default: true,
-            callback: function(response, convo) {
-							let res = response.text;
-							if(res.match(/[知し]って(る|いる)|把握|存知|存じて|はい/)){
-								convo.say("へぇ〜お兄ちゃんは博識だねー！");
-								convo.next();
-							}
-							else{
-								convo.say("えーお兄ちゃん知らないんだー…");
-								convo.next();
-							}
-            }
-        }]);
-    });
+		convo.ask(out_str,[{
+			default: true,
+			callback: function(response, convo) {
+				let res = response.text;
+				if(res.match(/[知し]って(る|いる)|把握|存知|存じて|はい/)){
+					convo.say("へぇ〜お兄ちゃんは博識だねー！");
+					convo.next();
+				}
+				else{
+					convo.say("えーお兄ちゃん知らないんだー…");
+					convo.next();
+				}
+			}
+		}]);
+	});
 });
 controller.hears(['echo'], ['ambient'], function(bot, message) {
   bot.reply(message,message.text);
 });
 controller.hears(['(^乱数$)','(^rand$)'], ['ambient'], function(bot, message) {
 	bot.startConversation(message,function(err, convo) {
-        convo.ask("わかった！最大数はいくつにする？",[
-            {
-                default: true,
-                callback: function(response, convo) {
-					let max_num = Number( response.text );
-					if(max_num <= 0){
-						convo.say("お兄ちゃん！1以上の数字じゃないとダメだよ！");
-		                convo.next();
-					}
-					else if( isNaN(max_num) ){
-						convo.say("お兄ちゃん！ちゃんと数字を入れて！");
-		                convo.next();
-					}
-					else if( !isFinite(max_num) ){
-						convo.say("お兄ちゃん！無限大なんて入れないで！");
-		                convo.next();
-					}
-					else{
-						let get_rand = Math.floor( Math.random() * max_num ) + 1;
-						let out_str = "ころころころ〜！「" + get_rand + "」が出たよ！\n";
-						convo.say(out_str);
-		                convo.next();
-					}
-                }
-            }
-        ]);
-    });
+		convo.ask("わかった！最大数はいくつにする？",[{
+			default: true,
+			callback: function(response, convo) {
+				let max_num = Number( response.text );
+				if(max_num <= 0){
+					convo.say("お兄ちゃん！1以上の数字じゃないとダメだよ！");
+					convo.next();
+				}
+				else if( isNaN(max_num) ){
+					convo.say("お兄ちゃん！ちゃんと数字を入れて！");
+					convo.next();
+				}
+				else if( !isFinite(max_num) ){
+					convo.say("お兄ちゃん！無限大なんて入れないで！");
+					convo.next();
+				}
+				else{
+					let get_rand = Math.floor( Math.random() * max_num ) + 1;
+					let out_str = "ころころころ〜！「" + get_rand + "」が出たよ！\n";
+					convo.say(out_str);
+					convo.next();
+				}
+			}
+		}]);
+	});
 });
 controller.hears('(^サイコロの旅$)', ['ambient'], function(bot, message) {
 	let latitude = (Math.random() * 180 ) - 90;
@@ -306,11 +322,10 @@ controller.hears(['(^乗(り?)換)'], ['ambient'], function(bot, message) {
 });
 controller.hears(['じゃんけん','ジャンケン'], ['ambient'], function(bot, message) {
 		console.log("USER:"+message.user);
-	    bot.startConversation(message,function(err, convo) {
-        convo.ask('じゃんけんしよう！じゃじゃじゃじゃーんけーん',[
-        {
-            default: true,
-            callback: function(response, convo) {
+		bot.startConversation(message,function(err, convo) {
+		convo.ask('じゃんけんしよう！じゃじゃじゃじゃーんけーん',[{
+			default: true,
+			callback: function(response, convo) {
 				console.log("USER:"+response.user);
 				let janken_res = response.text;
 				let tem_janken,your_janken;
@@ -354,38 +369,32 @@ controller.hears(['じゃんけん','ジャンケン'], ['ambient'], function(bo
 					out_str += "…ってお兄ちゃん！真面目にやってよ！もー！！\n";
 				}
 				// out_str += "Y:" + your_janken + " T:" + tem_janken;
-                convo.say(out_str);
-                convo.next();
-            }
-        }
-        ]);
-    });
+				convo.say(out_str);
+				convo.next();
+			}
+		}]);
+	});
 });
 controller.hears(['さよなら'],'direct_message,direct_mention,mention',function(bot, message) {
-
-    bot.startConversation(message,function(err, convo) {
-
-        convo.ask('「えっ…帰っちゃうけど…本当にいいの？」',[
-            {
-                pattern: bot.utterances.yes,
-                callback: function(response, convo) {
-                    convo.say('うん…わかった。さよならお兄ちゃん！');
-                    convo.next();
-                    setTimeout(function() {
-                        process.exit();
-                    },3000);
-                }
-            },
-        {
-            pattern: bot.utterances.no,
-            default: true,
-            callback: function(response, convo) {
-                convo.say('なーんだ！びっくりさせないでよぉ…');
-                convo.next();
-            }
-        }
-        ]);
-    });
+	bot.startConversation(message,function(err, convo) {
+		convo.ask('「えっ…帰っちゃうけど…本当にいいの？」',[{
+			pattern: bot.utterances.yes,
+			callback: function(response, convo) {
+				convo.say('うん…わかった。さよならお兄ちゃん！');
+				convo.next();
+				setTimeout(function() {
+					process.exit();
+				},3000);
+			}
+		},{
+			pattern: bot.utterances.no,
+			default: true,
+			callback: function(response, convo) {
+				convo.say('なーんだ！びっくりさせないでよぉ…');
+				convo.next();
+			}
+		}]);
+	});
 });
 // help
 // helpに表示されない隠しコマンド
@@ -433,13 +442,13 @@ controller.hears(['(今日(.*)アニメ)'], ['direct_mention,mention'], function
   getRequest(in_url).then( (result) => {
   	let AnimeDataSet = [];
   	let importAnimeSet = JSON.parse(result);
-    let outstr = "今日のアニメは...\n";
+	let outstr = "今日のアニメは...\n";
   	for(let i=0;i<importAnimeSet.items.length;i++){
   		AnimeDataSet[i] = new AnimeData(importAnimeSet.items[i]);
   		outstr += AnimeDataSet[i].showInfo() + "\n----\n";
   	}
-    outstr += "みたいだよ！お兄ちゃん！\n";
-    bot.reply(message,outstr);
+	outstr += "みたいだよ！お兄ちゃん！\n";
+	bot.reply(message,outstr);
   });
 });
 // 関数郡
@@ -449,10 +458,10 @@ function getRequest(getURL){
   return new Promise((resolve,reject) => {
   	request(getURL, function (error, response, body) {
   	  if(!error && response.statusCode == 200){
-        resolve(body);
+		resolve(body);
   		}
   		else{
-        reject(null);
+		reject(null);
   		}
   	});
   });
@@ -510,8 +519,8 @@ function ShortURL(in_url,callback){
 		},
 		json : true,
 		body :{
-            longUrl: in_url
-        }
+			longUrl: in_url
+		}
 	};
 	request.post(send_option,function(error, response, body){
 		if (!error && response.statusCode == 200) {
@@ -811,9 +820,9 @@ function play_mine(controller,bot,message){
 	if(mode == 0){
 		bot.startConversation(message,function(err, convo) {
 			convo.ask("新しいゲームを始めるよ！爆弾の数はいくつにする？\n(10個〜80個)",[
-            {
-                default: true,
-                callback: function(response, convo) {
+			{
+				default: true,
+				callback: function(response, convo) {
 					let out_str = "";
 					let bomb_num = Number(response.text);
 					if( bomb_num >= 10 && bomb_num <= 80 ){
@@ -835,9 +844,9 @@ function play_mine(controller,bot,message){
 						out_str = "数がおかしいよぉ・・・";
 					}
 					bot.reply(message,out_str);
-                    convo.next();
-                }
-            }
+					convo.next();
+				}
+			}
 			]);
 		});
 	}
